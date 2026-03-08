@@ -29,6 +29,8 @@ router.post("/execute", async (req, res) => {
 
     const data = await response.json();
 
+    console.log("FULL PISTON RESPONSE:", data);
+
     res.json(data);
   } catch (error) {
     console.error("Execution error:", error);

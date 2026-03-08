@@ -1,8 +1,8 @@
 import express from "express";
-
 const router = express.Router();
-
 router.post("/execute", async (req, res) => {
+  console.log("🔥 CODE EXECUTE ROUTE HIT");
+
   try {
     const { language, version, code } = req.body;
 

@@ -6,7 +6,7 @@ router.post("/execute", async (req, res) => {
   try {
     const { language, version, code } = req.body;
 
-    const response = await fetch("https://emacs.piston.rs/api/v2/execute", {
+    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,8 +28,6 @@ router.post("/execute", async (req, res) => {
     });
 
     const data = await response.json();
-
-    console.log("FULL PISTON RESPONSE:", data);
 
     res.json(data);
   } catch (error) {

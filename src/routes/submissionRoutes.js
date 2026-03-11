@@ -5,18 +5,21 @@ const router = express.Router();
 
 router.post("/submit", async (req, res) => {
   try {
-    const { problemId, code, language } = req.body;
+    const { problemId, code, language, version } = req.body;
 
-    if (!problemId || !code || !language) {
+    if (!problemId || !code || !language || !version) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
       });
     }
 
-    console.log("Running submission for:", problemId);
-
-    const result = await judgeSubmission(problemId, language, code);
+    const result = await judgeSubmission({
+      problemId,
+      code,
+      language,
+      version,
+    });
 
     const verdict =
       result.passed === result.total ? "Accepted" : "Wrong Answer";

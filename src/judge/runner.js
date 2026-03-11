@@ -8,6 +8,13 @@ if (!fs.existsSync(TEMP_DIR)) {
   fs.mkdirSync(TEMP_DIR);
 }
 
+function normalizeOutput(str) {
+  return str
+    .replace(/[\[\],]/g, " ") // remove brackets and commas
+    .replace(/\s+/g, " ") // normalize spaces
+    .trim();
+}
+
 function runProgram(language, code, input) {
   return new Promise((resolve) => {
     const id = Date.now();
@@ -47,6 +54,7 @@ function runProgram(language, code, input) {
 
     process.on("close", () => {
       fs.unlinkSync(filePath);
+
       resolve({
         stdout: stdout.trim(),
         stderr: stderr.trim(),
@@ -61,7 +69,10 @@ export async function runCodeAgainstTests(language, code, tests) {
   for (const test of tests) {
     const result = await runProgram(language, code, test.input);
 
-    const passed = result.stdout.trim() === test.output.trim();
+    const actual = normalizeOutput(result.stdout);
+    const expected = normalizeOutput(test.output);
+
+    const passed = actual === expected;
 
     results.push({
       input: test.input,

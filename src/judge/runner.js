@@ -71,7 +71,7 @@ export async function runCodeAgainstTests({
     );
 
     const data = await response.json();
-
+    console.log("PISTON RESPONSE:", data);
     const output = (data.run.stdout || "").trim();
 
     const passed = output === test.expected;
@@ -119,5 +119,6 @@ export async function judgeSubmission({ problemId, code, language, version }) {
 // Every time you restart ngrok you will get a new URL like:
 
 // https://xxxx.ngrok-free.dev
+//used vkgupta9529@gmail.com for email and created a free account on ngrok, with free account you get 4 hours of ngrok url, after that you have to restart ngrok to get new url. So every time you restart ngrok you will get new url, so make sure to update that url in runner.js file where we are calling code execution api.
 
 // Then you must update it in backend again.

@@ -4,9 +4,9 @@ const router = express.Router();
 
 router.post("/execute", async (req, res) => {
   try {
-    const { language, version, code } = req.body;
+    const { language, version, code, input } = req.body;
 
-    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+    const response = await fetch("http://localhost:2000/api/v2/execute", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -20,19 +20,23 @@ router.post("/execute", async (req, res) => {
             content: code,
           },
         ],
-        stdin: "",
-        args: [],
-        compile_timeout: 10000,
-        run_timeout: 3000,
+        stdin: input || "",
       }),
     });
 
     const data = await response.json();
 
-    res.json(data);
+    res.json({
+      success: true,
+      output: data.run.stdout,
+      error: data.run.stderr,
+      status: data.run.code,
+    });
   } catch (error) {
-    console.error("Execution error:", error);
+    console.error(error);
+
     res.status(500).json({
+      success: false,
       error: "Execution failed",
     });
   }

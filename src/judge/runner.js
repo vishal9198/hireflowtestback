@@ -50,7 +50,7 @@ export async function runCodeAgainstTests({
     const test = testCases[i];
 
     const response = await fetch(
-      "https://cordell-aglisten-gretchen.ngrok-free.dev/api/v2/execute",
+      process.env.PISTON_API_URL + "/api/v2/execute",
       {
         method: "POST",
         headers: {

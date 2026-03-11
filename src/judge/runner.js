@@ -58,7 +58,7 @@ export async function runCodeAgainstTests({
         },
         body: JSON.stringify({
           language,
-          version,
+          version: "*",
           files: [
             {
               name: "main",
@@ -72,7 +72,7 @@ export async function runCodeAgainstTests({
 
     const data = await response.json();
     console.log("PISTON RESPONSE:", data);
-    const output = (data.run.stdout || "").trim();
+    const output = (data?.run?.stdout || "").trim();
 
     const passed = output === test.expected;
 

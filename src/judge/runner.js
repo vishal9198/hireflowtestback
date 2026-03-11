@@ -1,112 +1,106 @@
 import fs from "fs";
 import path from "path";
+import { spawn } from "child_process";
 
-/*
----------------------------------------
-1️⃣ Load testcases
----------------------------------------
-*/
-export function loadTestCases(problemId) {
-  const testsDir = path.join(process.cwd(), "problems", problemId, "tests");
+const TEMP_DIR = "./temp";
 
-  const files = fs.readdirSync(testsDir);
-
-  const testCases = [];
-
-  files.forEach((file) => {
-    if (file.endsWith(".in")) {
-      const index = file.replace(".in", "");
-
-      const inputPath = path.join(testsDir, `${index}.in`);
-      const outputPath = path.join(testsDir, `${index}.out`);
-
-      const input = fs.readFileSync(inputPath, "utf8").trim();
-      const expected = fs.readFileSync(outputPath, "utf8").trim();
-
-      testCases.push({
-        input,
-        expected,
-      });
-    }
-  });
-
-  return testCases;
+if (!fs.existsSync(TEMP_DIR)) {
+  fs.mkdirSync(TEMP_DIR);
 }
 
-/*
----------------------------------------
-2️⃣ Run tests sequentially
----------------------------------------
-*/
-export async function runCodeAgainstTests({
-  code,
-  language,
-  version,
-  testCases,
-}) {
-  const results = [];
+function runProgram(language, code, input) {
+  return new Promise((resolve) => {
+    const id = Date.now();
+    let filePath;
+    let command;
+    let args;
 
-  for (let i = 0; i < testCases.length; i++) {
-    const test = testCases[i];
+    if (language === "javascript") {
+      filePath = path.join(TEMP_DIR, `${id}.js`);
+      fs.writeFileSync(filePath, code);
+      command = "node";
+      args = [filePath];
+    }
 
-    const response = await fetch("http://localhost:2000/api/v2/execute", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        language,
-        version,
-        files: [
-          {
-            name: "main",
-            content: code,
-          },
-        ],
-        stdin: test.input,
-      }),
+    if (language === "python") {
+      filePath = path.join(TEMP_DIR, `${id}.py`);
+      fs.writeFileSync(filePath, code);
+      command = "python3";
+      args = [filePath];
+    }
+
+    const process = spawn(command, args);
+
+    let stdout = "";
+    let stderr = "";
+
+    process.stdin.write(input);
+    process.stdin.end();
+
+    process.stdout.on("data", (data) => {
+      stdout += data.toString();
     });
 
-    const data = await response.json();
+    process.stderr.on("data", (data) => {
+      stderr += data.toString();
+    });
 
-    const output = (data.run.stdout || "").trim();
+    process.on("close", () => {
+      fs.unlinkSync(filePath);
+      resolve({
+        stdout: stdout.trim(),
+        stderr: stderr.trim(),
+      });
+    });
+  });
+}
 
-    const passed = output === test.expected;
+export async function runCodeAgainstTests(language, code, tests) {
+  const results = [];
+
+  for (const test of tests) {
+    const result = await runProgram(language, code, test.input);
+
+    const passed = result.stdout.trim() === test.output.trim();
 
     results.push({
       input: test.input,
-      expected: test.expected,
-      output,
+      expected: test.output,
+      output: result.stdout,
       passed,
     });
 
-    // stop early if failed
-    if (!passed) {
-      break;
-    }
+    if (!passed) break;
   }
 
   return results;
 }
 
-/*
----------------------------------------
-3️⃣ Main judge
----------------------------------------
-*/
-export async function judgeSubmission({ problemId, code, language, version }) {
-  const testCases = loadTestCases(problemId);
+export async function judgeSubmission(problemId, language, code) {
+  const testsDir = `./problems/${problemId}/tests`;
 
-  const results = await runCodeAgainstTests({
-    code,
-    language,
-    version,
-    testCases,
+  const files = fs.readdirSync(testsDir);
+
+  const inputs = files.filter((f) => f.endsWith(".in"));
+
+  const tests = inputs.map((inputFile) => {
+    const num = inputFile.split(".")[0];
+
+    const input = fs.readFileSync(`${testsDir}/${num}.in`, "utf8");
+    const output = fs.readFileSync(`${testsDir}/${num}.out`, "utf8");
+
+    return { input, output };
   });
 
+  const results = await runCodeAgainstTests(language, code, tests);
+
+  const passed = results.filter((r) => r.passed).length;
+
   return {
-    total: testCases.length,
-    passed: results.filter((r) => r.passed).length,
+    success: true,
+    verdict: passed === tests.length ? "Accepted" : "Wrong Answer",
+    passed,
+    total: tests.length,
     results,
   };
 }

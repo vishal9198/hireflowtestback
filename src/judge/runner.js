@@ -74,7 +74,9 @@ export async function runCodeAgainstTests({
     console.log("PISTON RESPONSE:", data);
     const output = (data?.run?.stdout || "").trim();
 
-    const passed = output === test.expected;
+    const normalize = (s) => s.trim().replace(/\s+/g, " ");
+
+    const passed = normalize(output) === normalize(test.expected);
 
     results.push({
       input: test.input,

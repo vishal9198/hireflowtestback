@@ -8,7 +8,7 @@ import { serve } from "inngest/express";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
-import codeRoutes from "./routes/codeRoutes.js";
+// import codeRoutes from "./routes/codeRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
 const app = express();
 
@@ -28,7 +28,7 @@ app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 //     credentials: true,
 //   }),
 // );
-app.use("/api/code", codeRoutes);
+// app.use("/api/code", codeRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use(clerkMiddleware()); //this adds auth field to req object//you can call req.auth to get auth info about user
 

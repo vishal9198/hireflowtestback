@@ -10,10 +10,33 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 // import codeRoutes from "./routes/codeRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
+import http from "http";
+import { Server } from "socket.io";
 const app = express();
+
+const server = http.createServer(app);
 
 const __dirname = path.resolve();
 
+export const io = new Server(server, {
+  cors: {
+    origin: ENV.CLIENT_URL,
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("join-session", (sessionId) => {
+    socket.join(sessionId);
+    console.log("User joined session:", sessionId);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 // middleware
 app.use(express.json());
 
@@ -68,7 +91,7 @@ if (ENV.NODE_ENV === "production") {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () => {
+    server.listen(ENV.PORT, () => {
       console.log("server is running on port:", ENV.PORT);
     });
   } catch (error) {

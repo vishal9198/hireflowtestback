@@ -8,7 +8,7 @@ router.post("/submit", async (req, res) => {
   try {
     const { problemId, code, language, version, sessionId } = req.body;
 
-    if (!problemId || !code || !language || !version || !sessionId) {
+    if (!problemId || !code || !language || !version) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -25,12 +25,14 @@ router.post("/submit", async (req, res) => {
     const verdict =
       result.passed === result.total ? "Accepted" : "Wrong Answer";
 
-    io.to(sessionId).emit("submission-result", {
-      verdict,
-      passed: result.passed,
-      total: result.total,
-      results: result.results,
-    });
+    if (sessionId) {
+      io.to(sessionId).emit("submission-result", {
+        verdict,
+        passed: result.passed,
+        total: result.total,
+        results: result.results,
+      });
+    }
 
     res.json({
       success: true,

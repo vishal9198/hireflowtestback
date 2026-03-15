@@ -12,6 +12,7 @@ export const ENV = {
   STREAM_API_SECRET: process.env.STREAM_API_SECRET,
   CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+  PISTON_API_URL: process.env.PISTON_API_URL,
   // set SERVE_CLIENT=true when you want the backend to serve frontend static files
   // SERVE_CLIENT: process.env.SERVE_CLIENT,
 };

@@ -37,6 +37,10 @@ io.on("connection", (socket) => {
     socket.to(sessionId).emit("code-update", code);
   });
 
+  socket.on("language-change", ({ sessionId, language }) => {
+    socket.to(sessionId).emit("language-update", language);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });

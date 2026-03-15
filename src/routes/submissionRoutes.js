@@ -1,13 +1,14 @@
 import express from "express";
 import { judgeSubmission } from "../judge/runner.js";
+import { io } from "../server.js";
 
 const router = express.Router();
 
 router.post("/submit", async (req, res) => {
   try {
-    const { problemId, code, language, version } = req.body;
+    const { problemId, code, language, version, sessionId } = req.body;
 
-    if (!problemId || !code || !language || !version) {
+    if (!problemId || !code || !language || !version || !sessionId) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -23,6 +24,13 @@ router.post("/submit", async (req, res) => {
 
     const verdict =
       result.passed === result.total ? "Accepted" : "Wrong Answer";
+
+    io.to(sessionId).emit("submission-result", {
+      verdict,
+      passed: result.passed,
+      total: result.total,
+      results: result.results,
+    });
 
     res.json({
       success: true,

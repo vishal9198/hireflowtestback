@@ -33,6 +33,10 @@ io.on("connection", (socket) => {
     console.log("User joined session:", sessionId);
   });
 
+  socket.on("code-change", ({ sessionId, code }) => {
+    socket.to(sessionId).emit("code-update", code);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });

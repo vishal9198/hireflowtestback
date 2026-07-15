@@ -18,6 +18,11 @@ const syncUser = inngest.createFunction(
       email: email_addresses[0]?.email_address,
       name: `${first_name || ""} ${last_name || ""}`,
       profileImage: image_url,
+
+      //new roles
+      role: "candidate",
+      company: null,
+      isActice: true,
     };
     await User.create(newUser);
     await upsertStreamUser({
@@ -25,7 +30,7 @@ const syncUser = inngest.createFunction(
       name: newUser.name,
       image: newUser.profileImage,
     });
-  }
+  },
 );
 
 const deleteUserFromDB = inngest.createFunction(
@@ -37,7 +42,7 @@ const deleteUserFromDB = inngest.createFunction(
 
     await User.deleteOne({ clerkId: id });
     await deleteStreamUser(id.toString());
-  }
+  },
 );
 
 export const functions = [syncUser, deleteUserFromDB];

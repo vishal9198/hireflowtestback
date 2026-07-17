@@ -1,0 +1,17 @@
+{
+  "id": "reverse-string",
+  "title": "Reverse String",
+  "description": "Given a string S, print the reverse of the string.",
+  "difficulty": "Easy",
+  "constraints": ["1 <= |S| <= 100000"],
+  "examples": [
+    {
+      "input": "hello",
+      "output": "olleh"
+    },
+    {
+      "input": "abc",
+      "output": "cba"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "two-sum",
+  "title": "Two Sum",
+  "description": "Given an array of integers nums and an integer target, return the indices of the two numbers such that they add up to the target. You may assume that exactly one valid answer exists, and you may not use the same element twice. Return the indices in any order.",
+  "difficulty": "Easy",
+  "constraints": [
+    "2 <= nums.length <= 100000",
+    "-1000000000 <= nums[i] <= 1000000000",
+    "-1000000000 <= target <= 1000000000",
+    "Exactly one valid answer exists."
+  ],
+  "examples": [
+    {
+      "input": "nums = [2,7,11,15], target = 9",
+      "output": "[0,1]"
+    },
+    {
+      "input": "nums = [3,2,4], target = 6",
+      "output": "[1,2]"
+    },
+    {
+      "input": "nums = [3,3], target = 6",
+      "output": "[0,1]"
+    }
+  ]
+}
